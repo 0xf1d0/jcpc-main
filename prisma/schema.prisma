@@ -1,0 +1,228 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Blog posts pour CTF writeups, tutoriels, événements
+model Post {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String   @db.Text
+  category    Category
+  tags        String[]
+  authorId    String?
+  author      Admin?   @relation("PostAuthor", fields: [authorId], references: [id])
+  authorName  String   @default("Équipe JCPC")
+  publishedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  readingTime Int
+  featured    Boolean  @default(false)
+  published   Boolean  @default(false)
+
+  // CTF specific fields
+  ctfName String?
+  ctfDate DateTime?
+  ranking String?
+
+  // Writeup specific fields
+  difficulty Difficulty?
+
+  // Event specific fields
+  eventDate     DateTime?
+  eventLocation String?
+  eventUrl      String?
+
+  createdAt DateTime @default(now())
+
+  @@index([category])
+  @@index([publishedAt])
+  @@index([featured])
+  @@index([published])
+}
+
+// Participations aux CTF
+model CTFParticipation {
+  id        String   @id @default(cuid())
+  name      String
+  date      DateTime
+  platform  String
+  ranking   String?
+  teamSize  Int
+  writeups  String[] // IDs des posts liés
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+}
+
+// Contacts depuis le formulaire
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String?
+  subject   String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+
+  @@index([createdAt])
+  @@index([read])
+}
+
+// Newsletter subscribers
+model Subscriber {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  subscribedAt DateTime  @default(now())
+  unsubscribed Boolean   @default(false)
+  unsubscribedAt DateTime?
+
+  @@index([email])
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         AdminRole @default(EDITOR)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastLoginAt  DateTime?
+  
+  sessions     Session[]
+  posts        Post[]    @relation("PostAuthor")
+
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  adminId   String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([adminId])
+}
+
+enum Category {
+  ctf
+  writeup
+  hardening
+  tutorial
+  event
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  EDITOR
+}
+
+// ========================================
+// Admin-managed Content Models
+// ========================================
+
+// Services displayed on the landing page carousel
+model Service {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  icon        String   // Lucide icon name
+  features    String[]
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+  @@index([active])
+}
+
+// Team members displayed on the landing page
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  description String
+  linkedin    String?
+  photo       String?  @db.Text
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+  @@index([active])
+}
+
+// Tags for blog posts (customizable hashtags)
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  color     String?  // Hex color code
+  createdAt DateTime @default(now())
+
+  @@index([slug])
+}
+
+// Article categories (replaces static enum for flexibility)
+model ArticleCategory {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  label       String
+  description String?
+  color       String   // CSS color class
+  icon        String?  // Lucide icon name
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([slug])
+  @@index([order])
+}
+
+// Site statistics displayed on landing page
+model SiteStat {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Int
+  suffix    String?  // e.g., "+", "%"
+  label     String
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+// Method steps displayed on landing page
+model MethodStep {
+  id          String   @id @default(cuid())
+  stepNumber  Int      @unique
+  title       String
+  description String
+  icon        String   // Lucide icon name
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+}

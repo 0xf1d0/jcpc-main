@@ -1,0 +1,128 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# ===================
+# Dependencies
+# ===================
+node_modules/
+.pnp/
+.pnp.js
+
+# ===================
+# Build outputs
+# ===================
+.next/
+out/
+build/
+dist/
+generated/
+
+# ===================
+# Environment & Secrets
+# ===================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+seed.ts
+
+# ===================
+# Database
+# ===================
+*.db
+*.sqlite
+*.sqlite3
+prisma/migrations/.migration_lock.toml
+
+# ===================
+# IDE & Editor
+# ===================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# ===================
+# OS files
+# ===================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ===================
+# Debug logs
+# ===================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# ===================
+# Test & Coverage
+# ===================
+coverage/
+.nyc_output/
+*.lcov
+
+# ===================
+# TypeScript
+# ===================
+*.tsbuildinfo
+next-env.d.ts
+
+# ===================
+# Vercel
+# ===================
+.vercel
+
+# ===================
+# Turbo
+# ===================
+.turbo/
+
+# ===================
+# Cache
+# ===================
+.cache/
+.eslintcache
+.stylelintcache
+
+# ===================
+# Misc
+# ===================
+*.log
+*.bak
+*.tmp
+*.temp
+*.orig
+
+# Large files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Media (should use external CDN in production)
+# Uncomment if you don't want to track media files
+# public/uploads/
+# *.mp4
+# *.mov
+# *.avi
+
+# Generated Prisma client (regenerated on install)
+# Uncomment if you prefer to regenerate on each install
+# generated/
